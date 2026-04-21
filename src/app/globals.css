@@ -1,26 +1,95 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fff8f5;
+  --foreground: #22181a;
+  --surface: #fffdfb;
+  --surface-strong: #f5e9e1;
+  --muted: #745b60;
+  --primary: #d8a7b4;
+  --primary-strong: #b9788f;
+  --secondary: #f0dfd1;
+  --accent: #b99043;
+  --accent-soft: rgba(185, 144, 67, 0.14);
+  --line: rgba(34, 24, 26, 0.08);
+  --shadow: 0 24px 80px rgba(102, 63, 73, 0.12);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-line: var(--line);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), sans-serif;
+  background-image:
+    radial-gradient(circle at top left, rgba(216, 167, 180, 0.28), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(185, 144, 67, 0.12), transparent 28%),
+    linear-gradient(180deg, #fff8f5 0%, #fffdfb 42%, #f7efe8 100%);
+}
+
+* {
+  border-color: var(--line);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease;
+}
+
+::selection {
+  background: rgba(185, 120, 143, 0.22);
+}
+
+.container-shell {
+  width: min(100% - 2rem, 1180px);
+  margin-inline: auto;
+}
+
+.section-space {
+  padding-block: 5rem;
+}
+
+.section-card {
+  background: rgba(255, 253, 251, 0.82);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.gold-outline {
+  box-shadow: inset 0 0 0 1px rgba(185, 144, 67, 0.22);
+}
+
+.grid-fade {
+  background-image:
+    linear-gradient(rgba(34, 24, 26, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 24, 26, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
 }

@@ -1,0 +1,8 @@
+<svg width="1200" height="320" viewBox="0 0 1200 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="320" rx="48" fill="#FFF8F5"/>
+<circle cx="120" cy="160" r="74" fill="#F0DFD1"/>
+<path d="M90 210V112H114L158 178V112H183V210H159L115 144V210H90Z" fill="#22181A"/>
+<path d="M243 210V112H270V187H316V210H243Z" fill="#22181A"/>
+<text x="360" y="150" fill="#22181A" font-family="Georgia, serif" font-size="74" font-weight="700">Luxe Nails</text>
+<text x="364" y="208" fill="#A9777F" font-family="Arial, sans-serif" font-size="28" letter-spacing="10">ATELIER</text>
+</svg>
