@@ -21,7 +21,7 @@ export default async function AdminContentPage() {
 
       <section className="space-y-4">
         <h2 className="text-2xl font-semibold text-foreground">Secções das páginas</h2>
-        <div className="grid gap-6 xl:grid-cols-2">
+        <div className="grid gap-6 2xl:grid-cols-2">
           {data.pages.map((page) => (
             <form key={page.id ?? `${page.slug}-${page.sectionKey}`} action={savePageContentAction} className="section-card space-y-4 rounded-[2rem] p-6">
               <input type="hidden" name="id" value={page.id ?? ""} />
@@ -72,7 +72,7 @@ export default async function AdminContentPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-2">
+      <section className="grid gap-6 2xl:grid-cols-2">
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-foreground">Banners</h2>
           {data.banners.map((banner) => (

@@ -93,3 +93,98 @@ textarea {
     linear-gradient(90deg, rgba(34, 24, 26, 0.04) 1px, transparent 1px);
   background-size: 32px 32px;
 }
+
+.admin-shell .section-card {
+  background: #fff;
+  backdrop-filter: none;
+  box-shadow: 0 14px 36px rgba(102, 63, 73, 0.1);
+}
+
+@keyframes adminFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes adminCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes adminPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes adminOverlayIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.admin-shell {
+  animation: adminFadeIn 300ms ease-out both;
+}
+
+.admin-shell .section-card {
+  animation: adminCardIn 320ms ease-out both;
+}
+
+.admin-shell button,
+.admin-shell a {
+  will-change: transform;
+}
+
+.admin-shell button:hover,
+.admin-shell a:hover {
+  transform: translateY(-1px);
+}
+
+.admin-shell input:focus,
+.admin-shell select:focus,
+.admin-shell textarea:focus {
+  box-shadow: 0 0 0 3px rgba(185, 120, 143, 0.16);
+  border-color: rgba(185, 120, 143, 0.45);
+}
+
+.admin-animate-pop {
+  animation: adminPopIn 180ms ease-out both;
+}
+
+.admin-animate-overlay {
+  animation: adminOverlayIn 180ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-shell,
+  .admin-shell .section-card,
+  .admin-animate-pop,
+  .admin-animate-overlay {
+    animation: none !important;
+  }
+
+  .admin-shell button:hover,
+  .admin-shell a:hover {
+    transform: none;
+  }
+}

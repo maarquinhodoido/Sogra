@@ -18,11 +18,11 @@ export default async function AdminServicesPage() {
         description="Crie categorias, defina preços, duração, imagens e estado ativo de cada serviço."
       />
 
-      <section className="grid gap-6 xl:grid-cols-2">
-        <div className="space-y-4">
+      <section className="grid gap-6 2xl:grid-cols-2">
+        <div className="min-w-0 space-y-4">
           <h2 className="text-2xl font-semibold text-foreground">Categorias</h2>
           {data.categories.map((category) => (
-            <form key={category.id} action={saveServiceCategoryAction} className="section-card grid gap-4 rounded-[2rem] p-6 md:grid-cols-[1fr,1fr,120px]">
+            <form key={category.id} action={saveServiceCategoryAction} className="section-card grid gap-4 rounded-[2rem] p-6 lg:grid-cols-[1fr,1fr,120px]">
               <input type="hidden" name="id" value={category.id} />
               <input name="name" defaultValue={category.name} placeholder="Nome" className="rounded-2xl border border-line bg-white px-4 py-3" />
               <input name="slug" defaultValue={category.slug} placeholder="Slug" className="rounded-2xl border border-line bg-white px-4 py-3" />
@@ -44,7 +44,7 @@ export default async function AdminServicesPage() {
           </form>
         </div>
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <h2 className="text-2xl font-semibold text-foreground">Serviços</h2>
           {data.services.map((service) => (
             <form key={service.id} action={saveServiceAction} className="section-card space-y-4 rounded-[2rem] p-6">

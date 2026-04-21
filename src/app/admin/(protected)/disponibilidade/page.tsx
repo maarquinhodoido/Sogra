@@ -19,7 +19,7 @@ export default async function AdminAvailabilityPage() {
 
       <section className="space-y-4">
         <h2 className="text-2xl font-semibold text-foreground">Horários</h2>
-        <div className="grid gap-6 xl:grid-cols-2">
+        <div className="grid gap-6 2xl:grid-cols-2">
           {data.hours.map((hour) => (
             <form key={hour.id} action={saveBusinessHourAction} className="section-card grid gap-4 rounded-[2rem] p-6 md:grid-cols-2">
               <input type="hidden" name="id" value={hour.id} />
@@ -66,7 +66,7 @@ export default async function AdminAvailabilityPage() {
 
       <section className="space-y-4">
         <h2 className="text-2xl font-semibold text-foreground">Bloqueios e folgas</h2>
-        <div className="grid gap-6 xl:grid-cols-2">
+        <div className="grid gap-6 2xl:grid-cols-2">
           {data.timeOffs.map((timeOff) => (
             <form key={timeOff.id} action={saveTimeOffAction} className="section-card space-y-4 rounded-[2rem] p-6">
               <input type="hidden" name="id" value={timeOff.id} />

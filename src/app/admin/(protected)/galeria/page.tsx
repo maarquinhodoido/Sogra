@@ -37,7 +37,7 @@ export default async function AdminGalleryPage() {
 
       <section className="space-y-4">
         <h2 className="text-2xl font-semibold text-foreground">Itens da galeria</h2>
-        <div className="grid gap-6 xl:grid-cols-2">
+        <div className="grid gap-6 2xl:grid-cols-2">
           {data.gallery.map((item) => (
             <form key={item.id} action={saveGalleryItemAction} className="section-card space-y-4 rounded-[2rem] p-6">
               <input type="hidden" name="id" value={item.id} />

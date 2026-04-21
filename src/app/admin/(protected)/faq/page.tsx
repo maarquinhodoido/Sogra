@@ -11,7 +11,7 @@ export default async function AdminFaqPage() {
         title="FAQ"
         description="Ordene perguntas frequentes e mantenha respostas claras sobre horários, atrasos e políticas."
       />
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid gap-6 2xl:grid-cols-2">
         {items.map((item) => (
           <form key={item.id} action={saveFaqAction} className="section-card space-y-4 rounded-[2rem] p-6">
             <input type="hidden" name="id" value={item.id} />

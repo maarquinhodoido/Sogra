@@ -11,7 +11,7 @@ export default async function AdminUsersPage() {
         title="Utilizadores admin"
         description="Gerir perfis com permissões, password, notas internas e estado ativo."
       />
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid gap-6 2xl:grid-cols-2">
         {users.map((user) => (
           <form key={user.id} action={saveAdminUserAction} className="section-card space-y-4 rounded-[2rem] p-6">
             <input type="hidden" name="id" value={user.id} />

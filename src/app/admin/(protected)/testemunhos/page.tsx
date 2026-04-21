@@ -11,7 +11,7 @@ export default async function AdminTestimonialsPage() {
         title="Testemunhos"
         description="Adicione, aprove e destaque avaliações de clientes na homepage e na página dedicada."
       />
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid gap-6 2xl:grid-cols-2">
         {testimonials.map((testimonial) => (
           <form key={testimonial.id} action={saveTestimonialAction} className="section-card space-y-4 rounded-[2rem] p-6">
             <input type="hidden" name="id" value={testimonial.id} />

@@ -34,6 +34,27 @@ function revalidateAll(paths: string[]) {
   }
 }
 
+async function buildUniqueProfessionalSlug(baseSlug: string, currentId?: string) {
+  const normalizedBase = baseSlug || `profissional-${Date.now()}`;
+
+  let candidate = normalizedBase;
+  let suffix = 1;
+
+  while (true) {
+    const existing = await prisma.professional.findUnique({
+      where: { slug: candidate },
+      select: { id: true },
+    });
+
+    if (!existing || existing.id === currentId) {
+      return candidate;
+    }
+
+    candidate = `${normalizedBase}-${suffix}`;
+    suffix += 1;
+  }
+}
+
 export async function loginAdminAction(
   _previousState: AdminActionState,
   formData: FormData,
@@ -348,12 +369,14 @@ export async function deleteGalleryItemAction(formData: FormData) {
 export async function saveProfessionalAction(formData: FormData) {
   await requireAdminSession();
   const id = sanitizeText(String(formData.get("id") ?? ""));
-  const name = sanitizeText(String(formData.get("name")));
+  const name = sanitizeText(String(formData.get("name"))) || "Profissional";
+  const baseSlug = sanitizeText(String(formData.get("slug"))) || slugify(name);
+  const uniqueSlug = await buildUniqueProfessionalSlug(baseSlug, id || undefined);
   const serviceIds = formData.getAll("serviceIds").map((value) => sanitizeText(String(value))).filter(Boolean);
   const data = {
     name,
-    slug: sanitizeText(String(formData.get("slug"))) || slugify(name),
-    specialty: sanitizeText(String(formData.get("specialty"))),
+    slug: uniqueSlug,
+    specialty: sanitizeText(String(formData.get("specialty"))) || "Especialista",
     bio: sanitizeMultiline(String(formData.get("bio"))),
     email: sanitizeText(String(formData.get("email"))) || null,
     phone: normalizePhone(String(formData.get("phone"))) || null,

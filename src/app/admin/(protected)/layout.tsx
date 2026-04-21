@@ -1,13 +1,13 @@
 import type { ReactNode } from "react";
 import { logoutAdminAction } from "@/app/actions/admin";
-import { AdminSidebar } from "@/components/admin/sidebar";
+import { AdminPanelFrame } from "@/components/admin/admin-panel-frame";
 import { requireAdminSession } from "@/lib/auth";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const session = await requireAdminSession();
 
   return (
-    <div className="container-shell py-6">
+    <div className="admin-shell container-shell py-6">
       <div className="mb-6 flex items-center justify-between rounded-[2rem] border border-line bg-white/80 px-6 py-4 backdrop-blur">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary-strong">Área protegida</p>
@@ -19,10 +19,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
           </button>
         </form>
       </div>
-      <div className="grid gap-6 xl:grid-cols-[280px,1fr]">
-        <AdminSidebar />
-        <div>{children}</div>
-      </div>
+      <AdminPanelFrame>{children}</AdminPanelFrame>
     </div>
   );
 }
