@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { adminLoginSchema } from "@/lib/validations";
 import { createAdminSession, destroyAdminSession, requireAdminSession, verifyPassword, hashPassword } from "@/lib/auth";
+import { combineDateAndTime, generateManageToken } from "@/lib/booking";
 import { limitRequest } from "@/lib/rate-limit";
 import { normalizePhone, sanitizeMultiline, sanitizeText, slugify } from "@/lib/sanitize";
 import { saveUploadedFile } from "@/lib/uploads";
@@ -534,6 +535,138 @@ export async function saveAppointmentAction(formData: FormData) {
   });
 
   revalidateAll(["/admin/marcacoes", "/marcacoes"]);
+}
+
+export async function cancelAppointmentAction(formData: FormData) {
+  await requireAdminSession();
+  const id = sanitizeText(String(formData.get("id")));
+  const cancelReason = sanitizeMultiline(String(formData.get("cancelReason"))) || "Sem motivo informado.";
+
+  if (!id) {
+    redirect("/admin/marcacoes?canceled=0");
+  }
+
+  const appointment = await prisma.appointment.findUnique({
+    where: { id },
+    select: { internalNotes: true },
+  });
+
+  if (!appointment) {
+    redirect("/admin/marcacoes?canceled=0");
+  }
+
+  const cancellationStamp = new Date().toLocaleString("pt-PT");
+  const cancellationEntry = `[Cancelamento ${cancellationStamp}] ${cancelReason}`;
+  const mergedNotes = appointment.internalNotes
+    ? `${appointment.internalNotes}\n${cancellationEntry}`
+    : cancellationEntry;
+
+  await prisma.appointment.update({
+    where: { id },
+    data: {
+      status: "CANCELED",
+      internalNotes: mergedNotes,
+    },
+  });
+
+  revalidateAll(["/admin/marcacoes", "/marcacoes"]);
+  redirect("/admin/marcacoes?canceled=1");
+}
+
+export async function createAdminAppointmentAction(formData: FormData) {
+  await requireAdminSession();
+
+  const serviceId = sanitizeText(String(formData.get("serviceId")));
+  const professionalId = sanitizeText(String(formData.get("professionalId")));
+  const date = sanitizeText(String(formData.get("date")));
+  const startTime = sanitizeText(String(formData.get("startTime")));
+  const customerName = sanitizeText(String(formData.get("customerName")));
+  const customerPhone = normalizePhone(String(formData.get("customerPhone")));
+  const customerEmail = sanitizeText(String(formData.get("customerEmail"))) || null;
+  const clientNotes = sanitizeMultiline(String(formData.get("clientNotes"))) || null;
+  const status = sanitizeText(String(formData.get("status"))) || "CONFIRMED";
+
+  if (!serviceId || !professionalId || !date || !startTime || !customerName || !customerPhone) {
+    redirect("/admin/marcacoes?created=0");
+  }
+
+  const [service, professional] = await Promise.all([
+    prisma.service.findUnique({ where: { id: serviceId } }),
+    prisma.professional.findUnique({ where: { id: professionalId } }),
+  ]);
+
+  if (!service || !professional) {
+    redirect("/admin/marcacoes?created=0");
+  }
+
+  const startAt = combineDateAndTime(date, startTime);
+  const endAt = new Date(startAt.getTime() + service.durationMinutes * 60 * 1000);
+
+  const [conflictingAppointment, conflictingTimeOff] = await Promise.all([
+    prisma.appointment.findFirst({
+      where: {
+        professionalId,
+        status: { notIn: ["CANCELED", "NO_SHOW"] },
+        startAt: { lt: endAt },
+        endAt: { gt: startAt },
+      },
+      select: { id: true },
+    }),
+    prisma.timeOff.findFirst({
+      where: {
+        startsAt: { lt: endAt },
+        endsAt: { gt: startAt },
+        OR: [{ professionalId: null }, { professionalId }],
+      },
+      select: { id: true },
+    }),
+  ]);
+
+  if (conflictingAppointment || conflictingTimeOff) {
+    redirect("/admin/marcacoes?created=0");
+  }
+
+  let customer = await prisma.customer.findFirst({
+    where: {
+      OR: [{ phone: customerPhone }, { email: customerEmail ?? undefined }],
+    },
+  });
+
+  if (!customer) {
+    customer = await prisma.customer.create({
+      data: {
+        name: customerName,
+        phone: customerPhone,
+        email: customerEmail,
+      },
+    });
+  } else {
+    customer = await prisma.customer.update({
+      where: { id: customer.id },
+      data: {
+        name: customerName,
+        phone: customerPhone,
+        email: customerEmail,
+      },
+    });
+  }
+
+  await prisma.appointment.create({
+    data: {
+      customerId: customer.id,
+      serviceId,
+      professionalId,
+      startAt,
+      endAt,
+      status,
+      clientNotes,
+      source: "admin",
+      manageToken: generateManageToken(),
+    },
+  });
+
+  revalidateAll(["/admin/marcacoes", "/marcacoes"]);
+  redirect("/admin/marcacoes?created=1");
 }
 
 export async function saveCustomerNotesAction(formData: FormData) {

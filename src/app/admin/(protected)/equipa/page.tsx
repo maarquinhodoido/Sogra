@@ -1,4 +1,4 @@
-import { saveProfessionalAction } from "@/app/actions/admin";
+import { deleteProfessionalAction, saveProfessionalAction } from "@/app/actions/admin";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { TeamManager } from "@/components/admin/team-manager";
 import { getAdminTeamData } from "@/lib/admin-data";
@@ -13,7 +13,12 @@ export default async function AdminTeamPage() {
         description="Pesquise rapidamente membros da equipa e crie novos perfis através de um formulário em pop-up."
       />
 
-      <TeamManager professionals={data.professionals} services={data.services} createAction={saveProfessionalAction} />
+      <TeamManager
+        professionals={data.professionals}
+        services={data.services}
+        saveAction={saveProfessionalAction}
+        deleteAction={deleteProfessionalAction}
+      />
     </div>
   );
 }

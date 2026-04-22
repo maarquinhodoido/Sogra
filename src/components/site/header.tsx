@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { CalendarDays, Camera, Menu, PhoneCall } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,8 +24,8 @@ export function SiteHeader({ businessName, instagramUrl, phone }: SiteHeaderProp
     <header className="sticky top-0 z-40 border-b border-line/80 bg-[rgba(255,248,245,0.82)] backdrop-blur-xl">
       <div className="container-shell flex items-center justify-between gap-4 py-4">
         <Link href="/" className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-accent-soft text-sm font-semibold text-accent">
-            LN
+          <span className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface text-sm font-semibold text-accent">
+            <Image src="/favicon.ico" alt="Luxe Nails" width={22} height={22} className="h-[22px] w-[22px] rounded-md" />
           </span>
           <div>
             <p className="font-[family-name:var(--font-geist-mono)] text-2xl leading-none text-foreground">
@@ -68,11 +69,11 @@ export function SiteHeader({ businessName, instagramUrl, phone }: SiteHeaderProp
           </Link>
         </div>
 
-        <details className="group lg:hidden">
+        <details className="site-mobile-nav group lg:hidden">
           <summary className="list-none rounded-full border border-line bg-surface p-3 text-foreground">
             <Menu className="h-5 w-5" />
           </summary>
-          <div className="absolute inset-x-4 top-[calc(100%+0.75rem)] rounded-3xl border border-line bg-surface p-5 shadow-[var(--shadow)]">
+          <div className="site-mobile-nav-panel absolute inset-x-4 top-[calc(100%+0.75rem)] rounded-3xl border border-line bg-surface p-5 shadow-[var(--shadow)]">
             <div className="flex flex-col gap-4">
               {navigation.map((item) => (
                 <Link key={item.href} href={item.href} className={cn("text-sm font-semibold text-muted", "hover:text-foreground")}>

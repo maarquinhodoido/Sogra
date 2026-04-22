@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Manrope } from "next/font/google";
+import { Lora, Manrope } from "next/font/google";
 import { getSiteSettings } from "@/lib/site-data";
 import "./globals.css";
 
-const headingFont = Cormorant_Garamond({
+const headingFont = Lora({
   variable: "--font-geist-mono",
   subsets: ["latin"],
   weight: ["500", "600", "700"],

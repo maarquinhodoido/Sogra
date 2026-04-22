@@ -2,7 +2,6 @@ import crypto from "node:crypto";
 import { addMinutes, endOfDay, isBefore, startOfDay } from "date-fns";
 import { prisma } from "@/lib/prisma";
 import {
-  demoBusinessHours,
   demoProfessionals,
   demoServices,
   demoSiteSettings,
@@ -10,6 +9,8 @@ import {
 } from "@/lib/demo-data";
 
 const SLOT_STEP = 15;
+const DEFAULT_SHIFT_START = "09:30";
+const DEFAULT_SHIFT_END = "22:30";
 
 function parseTime(value: string) {
   const [hours, minutes] = value.split(":").map(Number);
@@ -36,17 +37,15 @@ function overlaps(startA: Date, endA: Date, startB: Date, endB: Date) {
 
 async function getBookingContext(serviceId: string, professionalId: string, date: string) {
   const targetDate = new Date(`${date}T00:00:00`);
-  const weekday = targetDate.getDay();
   const fallbackService = demoServices.find((item) => item.id === serviceId) ?? demoServices[0];
   const fallbackProfessional =
     demoProfessionals.find((item) => item.id === professionalId) ?? demoProfessionals[0];
 
   try {
-    const [service, professional, settings, hours, timeOffs, appointments] = await Promise.all([
+    const [service, professional, settings, timeOffs, appointments] = await Promise.all([
       prisma.service.findUnique({ where: { id: serviceId } }),
       prisma.professional.findUnique({ where: { id: professionalId } }),
       prisma.siteSettings.findFirst(),
-      prisma.businessHour.findMany({ where: { weekday } }),
       prisma.timeOff.findMany({
         where: {
           startsAt: { lte: endOfDay(targetDate) },
@@ -67,7 +66,6 @@ async function getBookingContext(serviceId: string, professionalId: string, date
       serviceDuration: service?.durationMinutes ?? fallbackService.durationMinutes,
       bufferMinutes: settings?.bookingBufferMinutes ?? demoSiteSettings.bookingBufferMinutes,
       maxAppointmentsPerDay: settings?.maxAppointmentsPerDay ?? demoSiteSettings.maxAppointmentsPerDay,
-      hours,
       timeOffs,
       appointments,
       professionalSlug: professional?.slug ?? fallbackProfessional.slug,
@@ -77,18 +75,6 @@ async function getBookingContext(serviceId: string, professionalId: string, date
       serviceDuration: fallbackService.durationMinutes,
       bufferMinutes: demoSiteSettings.bookingBufferMinutes,
       maxAppointmentsPerDay: demoSiteSettings.maxAppointmentsPerDay,
-      hours: demoBusinessHours
-        .filter((item) => item.weekday === weekday)
-        .map((item, index) => ({
-          id: `fallback-${index}`,
-          weekday: item.weekday,
-          opensAt: item.opensAt,
-          closesAt: item.closesAt,
-          breakStart: item.breakStart ?? null,
-          breakEnd: item.breakEnd ?? null,
-          isClosed: item.isClosed ?? false,
-          professionalId: null,
-        })),
       timeOffs: demoTimeOffs
         .filter(
           (item) =>
@@ -113,21 +99,8 @@ async function getBookingContext(serviceId: string, professionalId: string, date
 
 export async function getAvailableSlots(serviceId: string, professionalId: string, date: string) {
   const context = await getBookingContext(serviceId, professionalId, date);
-  const dayRows = context.hours.filter((row) => !row.professionalId);
-  const selectedHours = dayRows[0];
-
-  if (!selectedHours || selectedHours.isClosed) {
-    return [];
-  }
-
-  if (context.appointments.length >= context.maxAppointmentsPerDay) {
-    return [];
-  }
-
-  const openMinutes = parseTime(selectedHours.opensAt);
-  const closeMinutes = parseTime(selectedHours.closesAt);
-  const breakStart = selectedHours.breakStart ? parseTime(selectedHours.breakStart) : null;
-  const breakEnd = selectedHours.breakEnd ? parseTime(selectedHours.breakEnd) : null;
+  const openMinutes = parseTime(DEFAULT_SHIFT_START);
+  const closeMinutes = parseTime(DEFAULT_SHIFT_END);
   const slots: Array<{ value: string; label: string }> = [];
   const durationWithBuffer = context.serviceDuration + context.bufferMinutes;
   const now = new Date();
@@ -137,15 +110,6 @@ export async function getAvailableSlots(serviceId: string, professionalId: strin
     cursor + context.serviceDuration <= closeMinutes;
     cursor += SLOT_STEP
   ) {
-    if (
-      breakStart !== null &&
-      breakEnd !== null &&
-      cursor < breakEnd &&
-      cursor + context.serviceDuration > breakStart
-    ) {
-      continue;
-    }
-
     const slotStart = combineDateAndTime(date, formatTime(cursor));
     const slotEnd = addMinutes(slotStart, context.serviceDuration);
     const slotEndWithBuffer = addMinutes(slotStart, durationWithBuffer);

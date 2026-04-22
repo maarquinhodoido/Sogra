@@ -60,7 +60,8 @@ npm install
 3. Para subir SQL Server local com Docker:
 
 ```bash
-docker compose up -d
+```
+```docker compose up -d
 ```
 
 4. Gere o Prisma Client:
